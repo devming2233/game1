@@ -106,10 +106,9 @@ function saveCustomImages() {
 
 loadCustomImages();
 
-// 预加载盘子图片（去除背景色）
+// 预加载盘子图片（本地文件直接加载，无需跨域）
 const PLATE_IMAGE = new Image();
-PLATE_IMAGE.src = 'assets/plate.jpg?v=2';
-PLATE_IMAGE.crossOrigin = 'anonymous';
+PLATE_IMAGE.src = 'assets/plate.jpg';
 let plateImageLoaded = false;
 let plateImageProcessed = null;
 
