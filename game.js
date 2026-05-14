@@ -108,17 +108,21 @@ loadCustomImages();
 
 // 预加载盘子图片（去除背景色）
 const PLATE_IMAGE = new Image();
-PLATE_IMAGE.src = 'assets/plate.jpg';
+PLATE_IMAGE.src = 'assets/plate.jpg?v=2';
 PLATE_IMAGE.crossOrigin = 'anonymous';
 let plateImageLoaded = false;
 let plateImageProcessed = null;
 
 PLATE_IMAGE.onload = () => {
     plateImageLoaded = true;
+    console.log('✅ 盘子图片加载成功:', PLATE_IMAGE.width, 'x', PLATE_IMAGE.height);
     // 处理图片：去除白色/浅色背景，替换为游戏主题色
     processPlateImage();
 };
-PLATE_IMAGE.onerror = () => { console.warn('盘子图片加载失败，使用默认绘制'); };
+PLATE_IMAGE.onerror = (e) => { 
+    console.error('❌ 盘子图片加载失败:', e);
+    console.warn('将使用默认绘制'); 
+};
 
 /**
  * 处理盘子图片：将白色/浅色背景替换为游戏主题色渐变
@@ -181,6 +185,29 @@ function drawPlate(plate) {
         }
         
         ctx.drawImage(plateImageProcessed, drawX, drawY, drawWidth, drawHeight);
+        return;
+    }
+    
+    // fallback: 直接使用原始图片（不处理背景色）
+    if (plateImageLoaded && PLATE_IMAGE.complete) {
+        const imgRatio = PLATE_IMAGE.width / PLATE_IMAGE.height;
+        const plateRatio = width / height;
+        
+        let drawWidth, drawHeight, drawX, drawY;
+        
+        if (imgRatio > plateRatio) {
+            drawWidth = width * 1.2;
+            drawHeight = drawWidth / imgRatio;
+            drawX = x - drawWidth / 2;
+            drawY = y + (height - drawHeight) / 2;
+        } else {
+            drawHeight = height * 1.2;
+            drawWidth = drawHeight * imgRatio;
+            drawX = x - drawWidth / 2;
+            drawY = y + (height - drawHeight) / 2;
+        }
+        
+        ctx.drawImage(PLATE_IMAGE, drawX, drawY, drawWidth, drawHeight);
         return;
     }
     
