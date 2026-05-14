@@ -681,6 +681,8 @@ function gameLoop() {
             if (checkCollision(gift, plate)) {
                 caught = true;
                 const config = CONFIG.giftTypes.find(g => g.type === gift.giftType);
+                
+                // 增加分数
                 gameState.score += config.score;
                 
                 // 创建粒子效果
@@ -707,7 +709,6 @@ function gameLoop() {
                             scale: 1.5,
                             color: '#FF69B4'
                         });
-                        updateUI();
                     }
                 }
                 
@@ -718,10 +719,9 @@ function gameLoop() {
                 if (gameState.score > gameState.highScore) {
                     gameState.highScore = gameState.score;
                     localStorage.setItem('catchGift_highScore', gameState.highScore);
-                    if (highScoreEl) highScoreEl.textContent = gameState.highScore;
                 }
                 
-                // 强制更新UI（分数+接住计数）
+                // 统一更新UI（分数、生命、盘子数）
                 updateUI();
                 break;
             }
