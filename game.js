@@ -479,6 +479,9 @@ function initGame() {
     // 初始化盘子位置（底部居中）
     updatePlates();
     
+    // 重置最高分显示
+    if (highScoreEl) highScoreEl.textContent = gameState.highScore;
+    
     updateUI();
 }
 
@@ -598,11 +601,11 @@ function showUpgradeNotice(text) {
 }
 
 /**
- * 更新UI
+ * 更新UI - 同步分数、生命、盘子数量到DOM
  */
 function updateUI() {
-    scoreEl.textContent = gameState.score;
-    plateCountEl.textContent = gameState.plateCount;
+    if (scoreEl) scoreEl.textContent = gameState.score;
+    if (plateCountEl) plateCountEl.textContent = gameState.plateCount;
     if (livesEl) livesEl.textContent = gameState.lives;
     // 更新信息栏标签（语言适配）
     updateInfoLabels();
@@ -626,7 +629,7 @@ function gameOver() {
     ctx.fillText(t('gameOver'), CONFIG.canvasWidth / 2, CONFIG.canvasHeight / 2 - 60);
     
     ctx.font = '24px Microsoft YaHei';
-    ctx.fillText(`${t('finalScore')}: ${gameState.score}`, CONFIG.canvasWidth / 2, CONFIG.canvasHeight / 2);
+    ctx.fillText(t('finalScore') + ': ' + gameState.score, CONFIG.canvasWidth / 2, CONFIG.canvasHeight / 2);
     
     ctx.font = '18px Microsoft YaHei';
     ctx.fillStyle = 'rgba(255,255,255,0.8)';
@@ -715,9 +718,10 @@ function gameLoop() {
                 if (gameState.score > gameState.highScore) {
                     gameState.highScore = gameState.score;
                     localStorage.setItem('catchGift_highScore', gameState.highScore);
-                    highScoreEl.textContent = gameState.highScore;
+                    if (highScoreEl) highScoreEl.textContent = gameState.highScore;
                 }
                 
+                // 强制更新UI（分数+接住计数）
                 updateUI();
                 break;
             }
@@ -741,6 +745,7 @@ function gameLoop() {
                 color: '#FF4444'
             });
             
+            // 强制更新UI显示最新生命数
             updateUI();
             
             // 检查游戏结束
