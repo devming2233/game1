@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title id="pageTitle">川普吃屎 | Trump Eats Poop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+        }
+        #gameTitle {
+            color: #fff;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        #gameInfo {
+            display: flex;
+            gap: 30px;
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        #gameInfo span {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        #gameCanvas {
+            border: 3px solid rgba(255,255,255,0.5);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        #controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Microsoft YaHei', sans-serif;
+            transition: all 0.3s;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .btn-start {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        }
+        .btn-pause {
+            background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #43e97b 0%, #38f9d7 100%);
+        }
+        #upgradeNotice {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+            padding: 30px 50px;
+            border-radius: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            display: none;
+            z-index: 100;
+            animation: popIn 0.5s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            80% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        #customModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        #customPanel {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+        }
+        #customPanel h3 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .custom-row {
+            margin-bottom: 15px;
+        }
+        .custom-row label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+        .custom-row input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+        }
+        .custom-row input[type="file"]:hover {
+            border-color: #667eea;
+        }
+        .preview-img {
+            max-width: 80px;
+            max-height: 80px;
+            margin-top: 5px;
+            border-radius: 8px;
+        }
+        .btn-close {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a6f);
+            width: 100%;
+            margin-top: 10px;
+        }
+        #mobileControls {
+            display: none;
+            margin-top: 10px;
+            gap: 20px;
+        }
+        .mobile-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.3);
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+        .mobile-btn:active {
+            background: rgba(255,255,255,0.5);
+        }
+        @media (max-width: 600px) {
+            #mobileControls {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameTitle">🍽️ 特朗普吃屎大作战</div>
+    <div id="gameInfo">
+        <span>🏆 分数: <strong id="score">0</strong></span>
+        <span>🎯 最高: <strong id="highScore">0</strong></span>
+        <span>❤️ 生命: <strong id="lives">5</strong></span>
+        <span>🍽️ 盘子: <strong id="plateCount">1</strong></span>
+    </div>
+    <canvas id="gameCanvas" width="480" height="640"></canvas>
+    <div id="controls">
+        <button class="btn btn-start" id="startBtn" onclick="toggleGame()">▶ 开始游戏</button>
+        <button class="btn btn-custom" id="langBtn" onclick="toggleLanguage()">🌐 English</button>
+    </div>
+    <div id="mobileControls">
+        <button class="mobile-btn" id="leftBtn">◀</button>
+        <button class="mobile-btn" id="rightBtn">▶</button>
+    </div>
+
+    <div id="upgradeNotice"></div>
+
+    <div id="customModal">
+        <div id="customPanel">
+            <h3>🎨 自定义图片</h3>
+            <div class="custom-row">
+                <p style="color:#888; font-size:12px; margin-bottom:10px;">💡 盘子已使用上传的图片，如需更换请替换 assets/plate.jpg 文件</p>
+            </div>
+            <div class="custom-row">
+                <label>普通便便 (10分):</label>
+                <input type="file" id="gift1File" accept="image/*" onchange="previewImage(this, 'gift1Preview')">
+                <img id="gift1Preview" class="preview-img" style="display:none">
+            </div>
+            <div class="custom-row">
+                <label>高级便便 (30分):</label>
+                <input type="file" id="gift2File" accept="image/*" onchange="previewImage(this, 'gift2Preview')">
+                <img id="gift2Preview" class="preview-img" style="display:none">
+            </div>
+            <div class="custom-row">
+                <label>稀有便便 (50分):</label>
+                <input type="file" id="gift3File" accept="image/*" onchange="previewImage(this, 'gift3Preview')">
+                <img id="gift3Preview" class="preview-img" style="display:none">
+            </div>
+            <button class="btn btn-close" onclick="closeCustom()">✅ 保存设置</button>
+        </div>
+    </div>
+
+    <script src="lang.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
